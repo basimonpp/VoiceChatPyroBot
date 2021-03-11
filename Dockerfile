@@ -1,9 +1,25 @@
-RUN apt-get update && apt upgrade -y && apt-get install sudo -y
-RUN git clone https://github.com/inukaasith/VoiceChatPyroBot.git tgvcbot && cd tgvcbot
-RUN pip(3) install -U -r requirements.txt
-RUN sudo apt install xrdp pulseaudio mplayer screen
-RUN cd ~ && wget https://telegram.org/dl/desktop/linux -O tdesktop.tar.xz && tar -xf tdesktop.tar.xz && rm tdesktop.tar.xz
-RUN echo "~/Telegram/Telegram" >~/.xsession
-RUN bash pa.sh
-RUN screen -S vcbot
-RUN python(3) bot.py
+FROM nikolaik/python-nodejs:python3.9-nodejs15-slim
+
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN apt-get update -y && \
+    apt-get install -yqq \
+        python3-pip \
+        git \
+        ffmpeg && \
+    git clone https://github.com/subinps/MusicPlayer-Heroku.git && \
+    cd MusicPlayer-Heroku && \
+    git clone https://github.com/pytgcalls/pytgcalls.git && \
+    cd pytgcalls && \
+    npm install && \
+    npm run prepare && \
+    cd pytgcalls/js && \
+    npm install && \
+    cd ../../ && \
+    pip3 install -r requirements.txt && \
+    cp -r ./pytgcalls /MusicPlayer-Heroku/ && \
+    cd /MusicPlayer-Heroku && \
+    pip3 install -U -r requirements.txt
+
+WORKDIR /MusicPlayer-Heroku
+CMD ["python3" "main.py"]
